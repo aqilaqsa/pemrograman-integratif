@@ -8,9 +8,10 @@
 3. npm init
 4. npm i @grpc/grpc-js
 5. npm i @grpc/proto-loader
-6. node server.js
-7. node run.js
+6. npm i firebase
+7. node server.js
+8. node run.js
 
-# next steps (unfulfilled requirements) #sad
-1. connect to database 
+# fulfilled requirements
+1. connect to database (firebase)
 2. modify CRUD to update data on database
