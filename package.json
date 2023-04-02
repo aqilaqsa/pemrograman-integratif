@@ -1,0 +1,24 @@
+{
+  "name": "pemrograman-integratif-1",
+  "version": "1.0.0",
+  "description": "Github Pemrograman Integratif",
+  "main": "client.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aqilaqsa/pemrograman-integratif.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/aqilaqsa/pemrograman-integratif/issues"
+  },
+  "homepage": "https://github.com/aqilaqsa/pemrograman-integratif#readme",
+  "dependencies": {
+    "@grpc/grpc-js": "^1.8.13",
+    "firebase": "^9.19.1"
+  }
+}
