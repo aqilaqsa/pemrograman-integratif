@@ -38,7 +38,7 @@ let contact = {
   ]
 }
 
-// Add service in proto, error?
+// Add service in proto
 server.addService(contactProto.ContactService.service, {
   // Create
   addContact: (call, callback) =>  {
