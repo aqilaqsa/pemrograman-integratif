@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+// Contact object
+message Contact {
+string id = 1;
+string name = 2;
+string phone = 3;
+string email = 4;
+}
+
+message ContactList {
+repeated Contact contact = 1;
+}
+
+message ContactId {
+string id = 1;
+}
+
+message Empty {}
+
+// Contact service
+service ContactService {
+// Create
+rpc AddContact (Contact) returns (Contact) {}
+// Read
+rpc GetAll (Empty) returns (ContactList) {}
+rpc GetContact (ContactId) returns (Contact) {}
+// Update
+rpc EditContact (Contact) returns (Contact) {}
+// Delete
+rpc DeleteContact (ContactId) returns (Empty) {}
+}
