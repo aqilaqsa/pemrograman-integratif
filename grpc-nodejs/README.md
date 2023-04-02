@@ -10,3 +10,7 @@
 5. npm i @grpc/proto-loader
 6. node server.js
 7. node run.js
+
+# next steps (unfulfilled requirements) #sad
+1. connect to database 
+2. modify CRUD to update data on database
