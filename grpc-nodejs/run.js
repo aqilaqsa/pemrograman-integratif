@@ -2,31 +2,31 @@
 
 const client = require("./client");
 
-// Add contact
-const newContact = {
-  id: "3",
-  name: "hai",
-  email: "halo@example.com",
-  phone: "8989898",
-};
-client.addContact(newContact, (error, response) => {
-  if (!error) {
-    console.log("Successfully created data");
-    console.log(response);
-  } else {
-    console.error(error);
-  }
-});
-
-// // Get all contacts
-// client.getAll({ contacts }, (error, response) => {
+// // Add contact
+// const newContact = {
+//   id: "3",
+//   name: "hai",
+//   email: "halo@example.com",
+//   phone: "8989898",
+// };
+// client.addContact(newContact, (error, response) => {
 //   if (!error) {
-//     console.log("Successfully fetched data");
+//     console.log("Successfully created data");
 //     console.log(response);
 //   } else {
 //     console.error(error);
 //   }
 // });
+
+// Get all contacts
+client.getAll({}, (error, response) => {
+  if (!error) {
+    console.log("Successfully fetched data");
+    console.log(response);
+  } else {
+    console.error(error);
+  }
+});
 
 // // Get a contact by ID
 // const contactId = "Il7nuYB3rUWY99ljKmBc";
