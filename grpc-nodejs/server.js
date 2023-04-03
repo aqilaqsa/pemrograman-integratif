@@ -30,24 +30,6 @@ const contactProto = grpc.loadPackageDefinition(packageDefinition);
 
 const server = new grpc.Server();
 
-// //dummy data
-// let contact = {
-//   contact: [
-//     {
-//       id: "1",
-//       nama: "Rudi",
-//       email: "capek@example.com",
-//       phone: "081234251827"
-//     },
-//     {
-//       id: "2",
-//       nama: "Budi",
-//       email: "abcde@example.com",
-//       phone: "085811292763"
-//     }
-//   ]
-// }
-
 // Add service in proto
 server.addService(contactProto.ContactService.service, {
   // Create
