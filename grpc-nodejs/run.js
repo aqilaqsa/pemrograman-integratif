@@ -1,3 +1,5 @@
+//modify CRUD function to update data on database (firebase)
+
 const client = require("./client");
 
 // Add contact
