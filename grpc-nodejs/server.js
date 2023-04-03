@@ -30,23 +30,23 @@ const contactProto = grpc.loadPackageDefinition(packageDefinition);
 
 const server = new grpc.Server();
 
-//dummy data
-let contact = {
-  contact: [
-    {
-      id: "1",
-      nama: "Rudi",
-      email: "capek@example.com",
-      phone: "081234251827"
-    },
-    {
-      id: "2",
-      nama: "Budi",
-      email: "abcde@example.com",
-      phone: "085811292763"
-    }
-  ]
-}
+// //dummy data
+// let contact = {
+//   contact: [
+//     {
+//       id: "1",
+//       nama: "Rudi",
+//       email: "capek@example.com",
+//       phone: "081234251827"
+//     },
+//     {
+//       id: "2",
+//       nama: "Budi",
+//       email: "abcde@example.com",
+//       phone: "085811292763"
+//     }
+//   ]
+// }
 
 // Add service in proto
 server.addService(contactProto.ContactService.service, {
@@ -116,33 +116,39 @@ getContact: (call, callback) => {
 },
 
   // Update
+  // Update
   editContact: (call, callback) => {
     const contactId = call.request.id;
     const contactRef = contactsRef.doc(contactId);
-  
+
     // Mengambil data kontak dari Firestore
-    contactRef.get()
-      .then(doc => {
+    contactRef
+      .get()
+      .then((doc) => {
         if (!doc.exists) {
-          throw new Error('Kontak tidak ditemukan');
+          throw new Error("Kontak tidak ditemukan");
         }
-  
+
         // Memperbarui data kontak dengan data baru dari permintaan
         const newData = {
-          nama: call.request.nama,
+          name: call.request.name,
           email: call.request.email,
-          phone: call.request.phone
+          phone: call.request.phone,
         };
-        return contactRef.update(newData);
-      })
-      .then(() => {
-        // Mengembalikan data kontak yang diperbarui ke panggilan kembali
-        return callback(null, newData);
-      })
-      .catch(error => {
-        console.error(error);
-        return callback(error);
-      });
+        return contactRef.update(newData)
+        .then(() => {
+          // Mengembalikan data kontak yang diperbarui ke panggilan kembali
+          return callback(null, newData);
+        })
+        .catch(error => {
+          console.error(error);
+          return callback(error);
+        });
+    })
+    .catch(error => {
+      console.error(error);
+      return callback(error);
+    });
   },
 
 // Delete
