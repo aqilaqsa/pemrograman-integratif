@@ -62,9 +62,9 @@ getAll: (call, callback) => {
         id: doc.id,
         ...doc.data()
       }));
-
+      console.log(contacts)
       // Mengembalikan data kontak ke panggilan kembali
-      return callback(null, { contacts });
+      return callback(null, { contact:contacts } );
     })
     .catch(error => {
       console.error(error);
@@ -97,8 +97,7 @@ getContact: (call, callback) => {
     });
 },
 
-  // Update
-  // Update
+// Update
   editContact: (call, callback) => {
     const contactId = call.request.id;
     const contactRef = contactsRef.doc(contactId);

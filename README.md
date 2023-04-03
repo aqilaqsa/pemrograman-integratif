@@ -21,6 +21,9 @@
 - Add Contact
 <a href='https://www.linkpicture.com/view.php?img=LPic642a5039aa851642274815'><img src='https://www.linkpicture.com/q/addContact.png' type='image'></a>
 
+- Get All Contacts
+<a href='https://www.linkpicture.com/view.php?img=LPic642ad6304575c1930324568'><img src='https://www.linkpicture.com/q/getAll.png' type='image'></a>
+
 - Get Contact by ID
 <a href='https://www.linkpicture.com/view.php?img=LPic642a5039aa851642274815'><img src='https://www.linkpicture.com/q/getContact.png' type='image'></a>
 
