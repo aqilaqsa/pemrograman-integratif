@@ -1,161 +1,125 @@
-const grpc = require('@grpc/grpc-js');
-var protoLoader = require('@grpc/proto-loader');
-const admin = require('firebase-admin');
+//running
 
-// Inisialisasi koneksi ke Firebase Admin SDK
-const serviceAccount = require('./serviceAccount.json');
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount)
+const grpc = require('@grpc/grpc-js');
+const protoLoader = require('@grpc/proto-loader');
+
+const packageDefinition = protoLoader.loadSync('./contacts.proto', {
+  keepCase: true,
+  longs: String,
+  enums: String,
+  defaults: true,
+  oneofs: true
 });
 
-// Mendapatkan referensi ke koleksi 'contacts' di Firestore
-const db = admin.firestore();
-const contactsRef = db.collection('contacts');
+const contactProto = grpc.loadPackageDefinition(packageDefinition).contact;
 
-//proto path
-const PROTO_PATH = './contact.proto';
+var admin = require("firebase-admin");
 
-const options = {
- keepCase: true,
- longs: String,
- enums: String,
- defaults: true,
- oneofs: true,
-};
+var serviceAccount = require("./pi-contactgrpcprotobuf-firebase-adminsdk-1nq2s-ecf18d34cd.json");
 
-var packageDefinition = protoLoader.loadSync(PROTO_PATH, options);
-
-//load proto
-const contactProto = grpc.loadPackageDefinition(packageDefinition);
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+  databaseURL: "https://pi-contactgrpcprotobuf-default-rtdb.asia-southeast1.firebasedatabase.app"
+});
 
 const server = new grpc.Server();
 
-// Add service in proto
-server.addService(contactProto.ContactService.service, {
-  // Create
-addContact: (call, callback) => {
-  const newContact = { ...call.request };
-
-  // Menambahkan data kontak baru ke Firestore
-  contactsRef.add(newContact)
-    .then(docRef => {
-      // Mengambil ID dokumen yang baru ditambahkan
-      const contactId = docRef.id;
-      const createdContact = { ...newContact, id: contactId };
-
-      // Mengembalikan data kontak yang baru ditambahkan ke panggilan kembali
-      return callback(null, createdContact);
-    })
-    .catch(error => {
-      console.error(error);
-      return callback(error);
-    });
-},
-
-  // Read
-getAll: (call, callback) => {
-  // Mengambil semua data kontak dari Firestore
-  contactsRef.get()
-    .then(querySnapshot => {
-      // Mengambil data dokumen dan mengubahnya menjadi array
-      const contacts = querySnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      }));
-      console.log(contacts)
-      // Mengembalikan data kontak ke panggilan kembali
-      return callback(null, { contact:contacts } );
-    })
-    .catch(error => {
-      console.error(error);
-      return callback(error);
-    });
-},
-
-getContact: (call, callback) => {
-  const contactId = call.request.id;
-
-  // Mendapatkan data kontak dengan ID yang sesuai dari Firestore
-  contactsRef.doc(contactId).get()
-    .then(doc => {
-      if (doc.exists) {
-        // Mengembalikan data kontak yang ditemukan ke panggilan kembali
-        const contactItem = {
-          id: doc.id,
-          ...doc.data()
-        };
-        return callback(null, contactItem);
-      } else {
-        // Mengembalikan kesalahan jika dokumen tidak ditemukan
-        const error = new Error(`Kontak dengan ID '${contactId}' tidak ditemukan`);
-        return callback(error);
-      }
-    })
-    .catch(error => {
-      console.error(error);
-      return callback(error);
-    });
-},
-
-// Update
-  editContact: (call, callback) => {
-    const contactId = call.request.id;
-    const contactRef = contactsRef.doc(contactId);
-
-    // Mengambil data kontak dari Firestore
-    contactRef
-      .get()
-      .then((doc) => {
-        if (!doc.exists) {
-          throw new Error("Kontak tidak ditemukan");
-        }
-
-        // Memperbarui data kontak dengan data baru dari permintaan
-        const newData = {
-          name: call.request.name,
-          email: call.request.email,
-          phone: call.request.phone,
-        };
-        return contactRef.update(newData)
-        .then(() => {
-          // Mengembalikan data kontak yang diperbarui ke panggilan kembali
-          return callback(null, newData);
-        })
-        .catch(error => {
-          console.error(error);
-          return callback(error);
-        });
-    })
-    .catch(error => {
-      console.error(error);
-      return callback(error);
-    });
-  },
-
-// Delete
-deleteContact: (call, callback) => {
-  const contactId = call.request.id;
-  const contactRef = contactsRef.doc(contactId);
-
-  // Menghapus data kontak dari Firestore
-  contactRef.delete()
-    .then(() => {
-      // Mengembalikan konfirmasi penghapusan ke panggilan kembali
-      return callback(null, { message: 'Kontak berhasil dihapus' });
-    })
-    .catch(error => {
-      console.error(error);
-      return callback(error);
-    });
-}
+server.addService(contactProto.Contacts.service, {
+  list: listContacts,
+  insert: insertContact,
+  get: getContact,
+  update: updateContact,
+  delete: deleteContact
 });
 
-// Start server 
-server.bindAsync(
-  "127.0.0.1:50051",
-  grpc.ServerCredentials.createInsecure(),
-  (error, port) => {
-    console.log("Server running at http://127.0.0.1:50051");
-    server.start();
-  }
-)
+server.bindAsync('localhost:50051', grpc.ServerCredentials.createInsecure(), () => {
+  console.log('Server running at http://localhost:50051');
+  server.start();
+});
+
+function listContacts(call, callback) {
+  const database = admin.database();
+  const ref = database.ref('contacts');
+
+  ref.once('value', snapshot => {
+    const contacts = [];
+
+    snapshot.forEach(childSnapshot => {
+      const contact = childSnapshot.val();
+      contact.id = childSnapshot.key;
+      contacts.push(contact);
+    });
+
+    callback(null, { contacts });
+  }, error => {
+    console.error(error);
+    callback(error);
+  });
+}
+
+function insertContact(call, callback) {
+  const database = admin.database();
+  const ref = database.ref('contacts');
+
+  const contact = call.request;
+  const id = ref.push().key;
+
+  ref.child(id).set(contact, error => {
+    if (error) {
+      console.error(error);
+      callback(error);
+    } else {
+      callback(null, { id });
+    }
+  });
+}
+
+function getContact(call, callback) {
+  const database = admin.database();
+  const ref = database.ref(`contacts/${call.request.id}`);
+
+  ref.once('value', snapshot => {
+    const contact = snapshot.val();
+
+    if (contact) {
+      contact.id = call.request.id;
+      callback(null, contact);
+    } else {
+      callback({
+        code: grpc.status.NOT_FOUND,
+        details: 'Not found'
+      });
+    }
+  }, error => {
+    console.error(error);
+    callback(error);
+  });
+}
+
+function updateContact(call, callback) {
+  const database = admin.database();
+  const ref = database.ref(`contacts/${call.request.id}`);
+
+  ref.update(call.request, error => {
+    if (error) {
+      console.error(error);
+      callback(error);
+    } else {
+      callback(null, {});
+    }
+  });
+}
+
+function deleteContact(call, callback) {
+  const database = admin.database();
+  const ref = database.ref(`contacts/${call.request.id}`);
+
+  ref.remove(error => {
+    if (error) {
+      console.error(error);
+      callback(error);
+    } else {
+      callback(null, {});
+    }
+  });
+}

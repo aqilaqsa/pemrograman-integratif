@@ -1,28 +1,31 @@
-//untuk menyediakan client-side stub yang dapat digunakan untuk mengirim permintaan ke server-side melalui protokol gRPC.
+const grpc = require('@grpc/grpc-js');
+const protoLoader = require('@grpc/proto-loader');
 
-const grpc = require("@grpc/grpc-js"); 
-var protoLoader = require("@grpc/proto-loader");
+// Load the protobuf
+const proto = protoLoader.loadSync('contacts.proto', {
+  keepCase: true,
+  longs: String,
+  enums: String,
+  defaults: true,
+  oneofs: true
+});
 
-const PROTO_PATH = "./contact.proto";
+const contactsProto = grpc.loadPackageDefinition(proto).Contacts;
 
-//konfigurasi protokol
-const options = {
-keepCase: true,
-longs: String,
-enums: String,
-defaults: true,
-oneofs: true, //hanya satu di antara fields yang dapat memiliki nilai pada saat yang sama.
+// Initialize the client
+const client = new contactsProto('localhost:50051', grpc.credentials.createInsecure());
+
+// Define a callback function for handling the server response
+const handleResponse = (err, response) => {
+  if (err) {
+    console.error(err);
+  } else {
+    console.log(response);
+  }
 };
 
-var packageDefinition = protoLoader.loadSync(PROTO_PATH, options);
-
-const ContactService = grpc.loadPackageDefinition(packageDefinition).ContactService;
-
-const client = new ContactService( //objek klien gRPC yang terhubung ke alamat IP dan port tertentu, menggunakan kredensial tanpa enkripsi
-"127.0.0.1:50051",
-grpc.credentials.createInsecure()
-);
-
-module.exports = client;
-
-//client-side stub adalah kode yang memungkinkan aplikasi klien untuk berkomunikasi dengan server menggunakan protokol gRPC dengan cara yang sudah didefinisikan di file .proto.
+// Call the server methods using the client
+client.createContact({ id: '1', name: 'Alice', email: 'alice@example.com', phone_number: '123-456-7890' }, handleResponse);
+client.readContact({ id: '1' }, handleResponse);
+client.updateContact({ id: '1', name: 'Bob', email: 'bob@example.com', phone_number: '123-456-7890' }, handleResponse);
+client.deleteContact({ id: '1' }, handleResponse);
