@@ -1,0 +1,21 @@
+{
+  "name": "grpc-nodejs",
+  "version": "1.0.0",
+  "description": "- project individu --> membuat project CRUD dengan implementasi gRPC API dan Protobuf\r - my project --> simple contact app",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@grpc/grpc-js": "^1.8.13",
+    "@grpc/proto-loader": "^0.7.6",
+    "firebase": "^9.19.1",
+    "firebase-admin": "^11.5.0",
+    "firestore": "^1.1.6",
+    "npm-watch": "^0.11.0"
+  }
+}
