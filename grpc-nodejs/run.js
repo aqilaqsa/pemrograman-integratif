@@ -1,4 +1,5 @@
 //modify CRUD function to update data on database (firebase)
+//semua hardcoded
 
 const client = require("./client");
 
